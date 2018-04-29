@@ -1,0 +1,27 @@
+{
+  "name": "elementaryframework/fire-fs",
+  "description": "Easily access and manage your files with PHP",
+  "type": "library",
+  "require-dev": {
+    "phpunit/phpunit": "^7"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Axel Nana",
+      "email": "ax.lnana@outlook.com"
+    }
+  ],
+  "require": {
+    "php": "^7.1.10"
+  },
+  "keywords": [
+    "filesystem",
+    "files"
+  ],
+  "autoload": {
+    "psr-4": {
+      "FireFS\\": "src/FireFS/"
+    }
+  }
+}
