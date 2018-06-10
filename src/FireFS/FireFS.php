@@ -30,7 +30,7 @@
  * @link      http://firefs.na2axl.tk
  */
 
-namespace FireFS;
+namespace ElementaryFramework\FireFS;
 
 
 /**

@@ -30,9 +30,17 @@
  * @link      http://firefs.na2axl.tk
  */
 
-namespace FireFS;
+namespace ElementaryFramework\FireFS;
 
-
+/**
+ * Mime Types
+ *
+ * Registry class used to store extensions
+ * and their associated mime types.
+ *
+ * @package     FireFS
+ * @author      Nana Axel <ax.lnana@outlook.com>
+ */
 class MimeTypes
 {
     private static $_mimes = array(
