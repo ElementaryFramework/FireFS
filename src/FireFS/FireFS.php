@@ -102,7 +102,7 @@ class FireFS
      *
      * @param string $rootPath The root path of the file system.
      */
-    public function __construct($rootPath = "./")
+    public function __construct(string $rootPath = "./")
     {
         if (is_dir($rootPath))
             $this->setRootPath(realpath($this->cleanPath($rootPath)));
@@ -119,7 +119,7 @@ class FireFS
      *
      * @return void
      */
-    public function setRootPath($rootPath)
+    public function setRootPath(string $rootPath)
     {
         $this->rootPath = $this->cleanPath($rootPath);
     }
@@ -131,7 +131,7 @@ class FireFS
      *
      * @return string
      */
-    public function cleanPath($path)
+    public function cleanPath(string $path): string
     {
         if ($this->isRemote($path)) {
             return $path;
@@ -169,7 +169,7 @@ class FireFS
      *
      * @return boolean true if the path is remote, and false otherwise.
      */
-    public function isRemote($path)
+    public function isRemote(string $path): bool
     {
         return (strpos($path, '://') !== false);
     }
@@ -177,13 +177,13 @@ class FireFS
     /**
      * Explode a path in an array.
      *
-     * @param string $path
+     * @param string $path The path to explode.
+     *
      * @return array The exploded path
      */
-    public function explodePath(string $path)
+    public function explodePath(string $path): array
     {
-        $path = str_replace(array("/", "\\"), DIRECTORY_SEPARATOR, $path);
-        return explode(DIRECTORY_SEPARATOR, $path);
+        return explode(DIRECTORY_SEPARATOR, str_replace(array("/", "\\"), DIRECTORY_SEPARATOR, $path));
     }
 
     /**
@@ -193,7 +193,7 @@ class FireFS
      *
      * @return void
      */
-    public function setWorkingDir($workingDir)
+    public function setWorkingDir(string $workingDir)
     {
         $this->workingDir = $workingDir;
     }
@@ -203,7 +203,7 @@ class FireFS
      *
      * @return array
      */
-    public function getAliases()
+    public function getAliases(): array
     {
         return $this->aliases;
     }
@@ -216,15 +216,13 @@ class FireFS
      *
      * @return void
      */
-    public function newAlias($key, $val)
+    public function newAlias(string $key, string $val)
     {
         if (substr($val, -1) == '/') {
             $val = substr($val, 0, -1);
         }
 
         $this->aliases[$key] = $val;
-
-        return;
     }
 
     /**
@@ -236,7 +234,7 @@ class FireFS
      *
      * @return string
      */
-    public function read($path)
+    public function read(string $path): string
     {
         $internalPath = $this->toInternalPath($path);
 
@@ -260,7 +258,7 @@ class FireFS
      *
      * @return string
      */
-    public function toInternalPath($path)
+    public function toInternalPath(string $path): string
     {
         $internalPath = $path;
 
@@ -313,7 +311,7 @@ class FireFS
      *
      * @return string
      */
-    public function rootPath()
+    public function rootPath(): string
     {
         return $this->rootPath;
     }
@@ -324,7 +322,7 @@ class FireFS
      * @param  array $path Parts of the path to build
      * @return string
      */
-    public function makePath(array $path)
+    public function makePath(array $path): string
     {
         return implode(DIRECTORY_SEPARATOR, array_map(function ($field) {
             return rtrim($field, '/\\');
@@ -336,7 +334,7 @@ class FireFS
      *
      * @return string
      */
-    public function workingDir()
+    public function workingDir(): string
     {
         return $this->workingDir;
     }
@@ -349,7 +347,7 @@ class FireFS
      *
      * @return \RuntimeException
      */
-    protected function accessDeniedException($path, $action = 'write')
+    protected function accessDeniedException(string $path, string $action = 'write'): \RuntimeException
     {
         $msg = "Cannot {$action} the file \"{$path}\": permission denied";
         if (!$this->isRemote($path)) {
@@ -369,7 +367,7 @@ class FireFS
      *
      * @return boolean
      */
-    public function write($path, $data, $append = false)
+    public function write(string $path, string $data, bool $append = false): bool
     {
         $internalPath = $this->toInternalPath($path);
         $applyChmod = false;
@@ -411,7 +409,7 @@ class FireFS
      *
      * @return boolean
      */
-    public function exists($path)
+    public function exists(string $path): bool
     {
         return file_exists($this->toInternalPath($path));
     }
@@ -426,7 +424,7 @@ class FireFS
      *
      * @return boolean
      */
-    public function mkfile($path, $createParent = false): bool
+    public function mkfile(string $path, bool $createParent = false): bool
     {
         $parentDir = $this->dirname($path);
 
@@ -455,22 +453,22 @@ class FireFS
      *
      * @return string
      */
-    public function dirname($path)
+    public function dirname(string $path): string
     {
         return $this->pathInfo($path, PATHINFO_DIRNAME);
     }
 
     /**
-     * Get an information about a specified path
+     * Get an information about a specified path.
      *
-     * @param string $path The path to get the information
-     * @param int $info The information to get about the path
+     * @param string $path The path to get the information.
+     * @param int $info The information to get about the path.
      *
      * @access protected
      *
      * @return string
      */
-    protected function pathInfo($path, $info)
+    protected function pathInfo(string $path, int $info): string
     {
         $internalPath = $this->cleanPath($path);
 
@@ -523,7 +521,7 @@ class FireFS
      *
      * @return boolean
      */
-    public function isDir($path)
+    public function isDir(string $path): bool
     {
         return is_dir($this->toInternalPath($path));
     }
@@ -538,7 +536,7 @@ class FireFS
      *
      * @return boolean
      */
-    public function mkdir($path, $recursive = false)
+    public function mkdir(string $path, bool $recursive = false): bool
     {
         $internalPath = $this->toInternalPath($path);
 
@@ -574,22 +572,22 @@ class FireFS
      *
      * @return boolean
      */
-    public function rename($path, $new_path)
+    public function rename(string $path, string $new_path): bool
     {
         return $this->move($path, $new_path);
     }
 
     /**
-     * Move the file
+     * Move the file.
      *
-     * @param string $path The current path of the file
-     * @param string $new_path The new path of the file
+     * @param string $path The current path of the file.
+     * @param string $new_path The new path of the file.
      *
      * @throws \RuntimeException
      *
      * @return boolean
      */
-    public function move($path, $new_path)
+    public function move(string $path, string $new_path): bool
     {
         if ($this->isDir($new_path) && !$this->isDir($path)) {
             $new_path = $this->makePath(array($new_path, $this->basename($path)));
@@ -612,13 +610,13 @@ class FireFS
     }
 
     /**
-     * Get the file's basename
+     * Get the file's basename.
      *
-     * @param string $path The path to the file
+     * @param string $path The path to the file.
      *
      * @return string
      */
-    public function basename($path)
+    public function basename(string $path): string
     {
         return $this->pathInfo($path, PATHINFO_BASENAME);
     }
@@ -633,7 +631,7 @@ class FireFS
      *
      * @return boolean
      */
-    public function copy($path, $new_path)
+    public function copy(string $path, string $new_path): bool
     {
         if ($this->isDir($new_path) && !$this->isDir($path)) {
             $new_path = $this->cleanPath($this->makePath(array($new_path, $this->basename($path))));
@@ -686,7 +684,7 @@ class FireFS
      *
      * @return array
      */
-    public function readDir($path, $recursive = false, $options = array('path_type' => self::REAL_PATH, 'file_type' => false, 'filter' => false))
+    public function readDir(string $path, bool $recursive = false, array $options = array('path_type' => self::REAL_PATH, 'file_type' => false, 'filter' => false)): array
     {
         if (!$this->isRemote($path) && !is_readable($this->toInternalPath($path))) {
             throw $this->accessDeniedException($path, 'read');
@@ -765,7 +763,7 @@ class FireFS
      *
      * @return string
      */
-    public function extension($path)
+    public function extension(string $path): string
     {
         return $this->pathInfo($path, PATHINFO_EXTENSION);
     }
@@ -777,7 +775,7 @@ class FireFS
      *
      * @return string
      */
-    public function toExternalPath($internalPath)
+    public function toExternalPath(string $internalPath): string
     {
         $externalPath = $internalPath;
 
@@ -825,7 +823,7 @@ class FireFS
      *
      * @return string
      */
-    public function toFileSystemPath($internalPath)
+    public function toFileSystemPath(string $internalPath): string
     {
         $externalPath = $internalPath;
 
@@ -870,7 +868,7 @@ class FireFS
      *
      * @return string The temporary file path.
      */
-    public function tmpfile()
+    public function tmpfile(): string
     {
         $tmpDir = $this->toInternalPath($this->rootPath . "/tmp");
 
@@ -895,16 +893,16 @@ class FireFS
     }
 
     /**
-     * Delete the file
+     * Delete the file.
      *
-     * @param string $path The path to the file to delete
-     * @param bool $recursive Define if we have to delete all subfiles
+     * @param string $path The path to the file to delete.
+     * @param bool $recursive Define if we have to delete all subfiles.
      *
      * @throws \RuntimeException
      *
      * @return boolean
      */
-    public function delete($path, $recursive = false)
+    public function delete(string $path, bool $recursive = false): bool
     {
         $internalPath = $this->toInternalPath($path);
 
@@ -937,49 +935,49 @@ class FireFS
     }
 
     /**
-     * Get the file's last modification time
+     * Get the file's last modification time.
      *
-     * @param string $path The path to the file
+     * @param string $path The path to the file.
      *
      * @return int
      */
-    public function lastModTime($path)
+    public function lastModTime(string $path): int
     {
         return filemtime($this->toInternalPath($path));
     }
 
     /**
-     * Get the file's last access time
+     * Get the file's last access time.
      *
-     * @param string $path The path to the file
+     * @param string $path The path to the file.
      *
      * @return int
      */
-    public function lastAccessTime($path)
+    public function lastAccessTime(string $path): int
     {
         return fileatime($this->toInternalPath($path));
     }
 
     /**
-     * Get the file's name without extension
+     * Get the file's name without extension.
      *
-     * @param string $path the path to the file
+     * @param string $path the path to the file.
      *
      * @return string
      */
-    public function filename($path)
+    public function filename(string $path): string
     {
         return $this->pathInfo($path, PATHINFO_FILENAME);
     }
 
     /**
-     * Get the file's size in octets
+     * Get the file's size in octets.
      *
-     * @param string $path The path to the file
+     * @param string $path The path to the file.
      *
      * @return string
      */
-    public function sizeInOctets($path)
+    public function sizeInOctets(string $path): string
     {
         $size = $this->size($path);
         $unit = 'b';
@@ -1001,17 +999,17 @@ class FireFS
             $unit = 'Tb';
         }
 
-        return round($size, 2) . ' ' . $unit;
+        return round($size, 2) . $unit;
     }
 
     /**
-     * Get the file's size
+     * Get the file's size.
      *
-     * @param string $path The path to the file
+     * @param string $path The path to the file.
      *
      * @return int
      */
-    public function size($path)
+    public function size(string $path): int
     {
         if ($this->isDir($path)) {
             $totalSize = 0;
@@ -1034,10 +1032,10 @@ class FireFS
      *
      * @return boolean
      */
-    public function isBinary($path)
+    public function isBinary(string $path): boolean
     {
         $mime = $this->mimeType($path);
-        return (substr($mime, 0, 5) != 'text/');
+        return (substr($mime, 0, 5) !== "text/");
     }
 
     /**
@@ -1048,7 +1046,7 @@ class FireFS
      *
      * @return string
      */
-    public function mimeType(string $path, int $index = 0)
+    public function mimeType(string $path, int $index = 0): string
     {
         $fileExtension = $this->extension($path);
 
@@ -1075,13 +1073,13 @@ class FireFS
     }
 
     /**
-     * Remove the hostname from the path
+     * Remove the hostname from the path.
      *
-     * @param string $path The path to remove the hostname
+     * @param string $path The path to remove the hostname.
      *
      * @return string
      */
-    public function removeHostFromPath($path)
+    public function removeHostFromPath(string $path): string
     {
         return parse_url($path, PHP_URL_PATH);
     }
