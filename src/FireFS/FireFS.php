@@ -1031,7 +1031,7 @@ class FireFS
      *
      * @return boolean
      */
-    public function isBinary(string $path): boolean
+    public function isBinary(string $path): bool
     {
         $mime = $this->mimeType($path);
         return (substr($mime, 0, 5) !== "text/");
