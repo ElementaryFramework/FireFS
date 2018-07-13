@@ -655,7 +655,7 @@ class FireFS
             $res = false;
 
             foreach ($subfiles as $fileToCopyName => $fileToCopyPath) {
-                $res = $this->copy("{$path}/{$fileToCopyName}", "{$new_path}/{$fileToCopyName}");
+                $res = $this->copy($this->makePath(array($path, $fileToCopyName)), $this->makePath(array($new_path, $fileToCopyName)));
 
                 if (!$res)
                     break;
