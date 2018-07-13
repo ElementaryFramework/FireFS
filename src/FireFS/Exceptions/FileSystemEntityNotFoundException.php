@@ -34,5 +34,8 @@ namespace ElementaryFramework\FireFS\Exceptions;
 
 class FileSystemEntityNotFoundException extends \Exception
 {
-
+    public function __construct(string $path)
+    {
+        parent::__construct("Unable to find the entity at path \"{$path}\"");
+    }
 }
