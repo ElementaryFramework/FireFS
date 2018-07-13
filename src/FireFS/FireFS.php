@@ -32,7 +32,6 @@
 
 namespace ElementaryFramework\FireFS;
 
-
 /**
  * FireFS - Filesystem Manager Class
  *
@@ -566,15 +565,15 @@ class FireFS
      * Rename the file
      *
      * @param string $path The current path of the file
-     * @param string $new_path The new path of the file
+     * @param string $new_name The new name of the file
      *
      * @throws \RuntimeException
      *
      * @return boolean
      */
-    public function rename(string $path, string $new_path): bool
+    public function rename(string $path, string $new_name): bool
     {
-        return $this->move($path, $new_path);
+        return $this->move($path, $this->makePath(array($this->dirname($path), $new_name)));
     }
 
     /**
