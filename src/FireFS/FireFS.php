@@ -32,6 +32,8 @@
 
 namespace ElementaryFramework\FireFS;
 
+use ElementaryFramework\FireFS\Exceptions\FileSystemEntityNotFoundException;
+
 /**
  * FireFS - Filesystem Manager Class
  *
@@ -1081,5 +1083,23 @@ class FireFS
     public function removeHostFromPath(string $path): string
     {
         return parse_url($path, PHP_URL_PATH);
+    }
+
+    /**
+     * Gets the file entity at the given path.
+     *
+     * @param string $path
+     *
+     * @return File|Folder
+     *
+     * @throws Exceptions\FileSystemEntityNotFoundException
+     */
+    public function getEntity(string $path)
+    {
+        if ($this->exists($path)) {
+            return $this->isDir($path) ? new Folder($path, $this) : new File($path, $this);
+        } else {
+            throw new FileSystemEntityNotFoundException($path);
+        }
     }
 }
