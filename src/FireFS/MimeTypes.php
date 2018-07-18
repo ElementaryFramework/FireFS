@@ -41,7 +41,7 @@ namespace ElementaryFramework\FireFS;
  * @package     FireFS
  * @author      Nana Axel <ax.lnana@outlook.com>
  */
-class MimeTypes
+abstract class MimeTypes
 {
     private static $_mimes = array(
         '3g2'   =>  'video/3gpp2',

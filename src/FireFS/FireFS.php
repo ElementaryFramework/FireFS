@@ -32,6 +32,7 @@
 
 namespace ElementaryFramework\FireFS;
 
+use ElementaryFramework\FireFS\Exceptions\FileSystemEntityNotFoundException;
 
 /**
  * FireFS - Filesystem Manager Class
@@ -300,7 +301,7 @@ class FireFS
 
         // Convert relative path to absolute path
         if (preg_match('#^(\.)+/#', $internalPath)) {
-            $internalPath = $this->makePath(array($this->workingDir(), $internalPath));
+            $internalPath = $this->makePath($this->workingDir(), $internalPath);
         }
 
         // Apply aliases
@@ -311,7 +312,7 @@ class FireFS
 
             foreach ($this->aliases as $key => $value) {
                 if (substr($internalPath, 0, strlen($key)) == $key) {
-                    $internalPath = $this->makePath(array($value, substr($internalPath, strlen($key))));
+                    $internalPath = $this->makePath($value, substr($internalPath, strlen($key)));
                     $appliedAliasesNbr++;
                 }
             }
@@ -322,7 +323,7 @@ class FireFS
         // Prepend the root path
         $rootPath = $this->rootPath();
         if (!empty($rootPath)) {
-            $internalPath = $this->makePath(array($rootPath, $internalPath));
+            $internalPath = $this->makePath($rootPath, $internalPath);
         }
 
         return $this->cleanPath($internalPath);
@@ -341,10 +342,10 @@ class FireFS
     /**
      * Implode all parts of $path and return a valid path
      *
-     * @param  array $path Parts of the path to build
+     * @param  string[] $path Parts of the path to build
      * @return string
      */
-    public function makePath(array $path): string
+    public function makePath(string ...$path): string
     {
         return implode(DIRECTORY_SEPARATOR, array_map(function ($field) {
             return rtrim($field, '/\\');
@@ -588,15 +589,15 @@ class FireFS
      * Rename the file
      *
      * @param string $path The current path of the file
-     * @param string $new_path The new path of the file
+     * @param string $new_name The new name of the file
      *
      * @throws \RuntimeException
      *
      * @return boolean
      */
-    public function rename(string $path, string $new_path): bool
+    public function rename(string $path, string $new_name): bool
     {
-        return $this->move($path, $new_path);
+        return $this->move($path, $this->makePath($this->dirname($path), $new_name));
     }
 
     /**
@@ -612,7 +613,7 @@ class FireFS
     public function move(string $path, string $new_path): bool
     {
         if ($this->isDir($new_path) && !$this->isDir($path)) {
-            $new_path = $this->makePath(array($new_path, $this->basename($path)));
+            $new_path = $this->makePath($new_path, $this->basename($path));
         }
 
         $destDirname = $this->dirname($new_path);
@@ -656,7 +657,7 @@ class FireFS
     public function copy(string $path, string $new_path): bool
     {
         if ($this->isDir($new_path) && !$this->isDir($path)) {
-            $new_path = $this->cleanPath($this->makePath(array($new_path, $this->basename($path))));
+            $new_path = $this->cleanPath($this->makePath($new_path, $this->basename($path)));
         }
 
         $destDirname = $this->dirname($new_path);
@@ -678,7 +679,7 @@ class FireFS
             $res = false;
 
             foreach ($subfiles as $fileToCopyName => $fileToCopyPath) {
-                $res = $this->copy("{$path}/{$fileToCopyName}", "{$new_path}/{$fileToCopyName}");
+                $res = $this->copy($this->makePath($path, $fileToCopyName), $this->makePath($new_path, $fileToCopyName));
 
                 if (!$res)
                     break;
@@ -721,7 +722,7 @@ class FireFS
 
         if ($handle = opendir($path)) {
             while (($file = readdir($handle)) !== false) {
-                $filepath = $this->cleanPath($this->makePath(array($path, $file)));
+                $filepath = $this->cleanPath($this->makePath($path, $file));
 
                 // Removing dirty
                 if ($file == '.' || $file == '..') {
@@ -764,7 +765,7 @@ class FireFS
                 if ($recursive === true && $this->isDir($filepath)) {
                     $subfiles = $this->readDir($filepath, $recursive, $options);
                     foreach ($subfiles as $subfilename => $subfilepath) {
-                        $files[$this->makePath(array($file, $subfilename))] = $subfilepath;
+                        $files[$this->makePath($file, $subfilename)] = $subfilepath;
                     }
                 }
             }
@@ -826,7 +827,7 @@ class FireFS
             foreach ($this->aliases as $key => $value) {
                 $value = '/' . $value;
                 if (substr($externalPath, 0, strlen($value)) == $value) {
-                    $externalPath = $this->makePath(array($key, substr($externalPath, strlen($value))));
+                    $externalPath = $this->makePath($key, substr($externalPath, strlen($value)));
                     $appliedAliasesNbr++;
                 }
             }
@@ -870,7 +871,7 @@ class FireFS
 
             foreach ($this->aliases as $key => $value) {
                 if (substr($externalPath, 0, strlen($key)) == $key) {
-                    $externalPath = $this->makePath(array($value, substr($externalPath, strlen($key))));
+                    $externalPath = $this->makePath($value, substr($externalPath, strlen($key)));
                     $appliedAliasesNbr++;
                 }
             }
@@ -1051,7 +1052,7 @@ class FireFS
      *
      * @return boolean
      */
-    public function isBinary(string $path): boolean
+    public function isBinary(string $path): bool
     {
         $mime = $this->mimeType($path);
         return (substr($mime, 0, 5) !== "text/");
@@ -1101,5 +1102,23 @@ class FireFS
     public function removeHostFromPath(string $path): string
     {
         return parse_url($path, PHP_URL_PATH);
+    }
+
+    /**
+     * Gets the file entity at the given path.
+     *
+     * @param string $path
+     *
+     * @return File|Folder
+     *
+     * @throws Exceptions\FileSystemEntityNotFoundException
+     */
+    public function getEntity(string $path)
+    {
+        if ($this->exists($path)) {
+            return $this->isDir($path) ? new Folder($path, $this) : new File($path, $this);
+        } else {
+            throw new FileSystemEntityNotFoundException($path);
+        }
     }
 }
