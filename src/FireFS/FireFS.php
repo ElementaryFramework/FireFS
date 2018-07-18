@@ -86,6 +86,14 @@ class FireFS
     protected $workingDir = '';
 
     /**
+     * The path to the directory used to store
+     * temporary files.
+     *
+     * @var string
+     */
+    protected $tempDir = '';
+
+    /**
      * Aliases
      *
      * @var array
@@ -109,7 +117,8 @@ class FireFS
         else
             throw new \RuntimeException("The directory \"{$rootPath}\" can't be located.");
 
-        $this->setWorkingDir('/');
+        $this->setWorkingDir('./');
+        $this->setTempDir('./tmp');
     }
 
     /**
@@ -122,6 +131,18 @@ class FireFS
     public function setRootPath(string $rootPath)
     {
         $this->rootPath = $this->cleanPath($rootPath);
+    }
+
+    /**
+     * Changes the path to the directory of
+     * temporary files.
+     *
+     * @param string $path The path to the directory starting
+     *                     to the root path.
+     */
+    public function setTempDir(string $path)
+    {
+        $this->tempDir = $this->cleanPath($path);
     }
 
     /**
@@ -189,7 +210,8 @@ class FireFS
     /**
      * Set the current working directory
      *
-     * @param string $workingDir The path to the directory
+     * @param string $workingDir The path to the directory starting
+     *                           to the root path.
      *
      * @return void
      */
@@ -870,20 +892,17 @@ class FireFS
      */
     public function tmpfile(): string
     {
-        $tmpDir = $this->toInternalPath($this->rootPath . "/tmp");
+        $tmpDir = $this->toInternalPath($this->tempDir);
 
         if (!$this->isDir($tmpDir)) {
             $this->mkdir($tmpDir, true);
         }
 
-        $tmpFile = tempnam($tmpDir, "tmp_");
+        $tmpFile = tempnam($tmpDir, "tmp");
 
         $fileManager = $this;
-        $currentDir = getcwd();
 
-        register_shutdown_function(function () use ($tmpFile, $fileManager, $currentDir) {
-            chdir($currentDir);
-
+        register_shutdown_function(function () use ($tmpFile, $fileManager) {
             if ($fileManager->exists($tmpFile)) {
                 $fileManager->delete($tmpFile, true);
             }
