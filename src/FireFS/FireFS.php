@@ -181,7 +181,7 @@ class FireFS
             $beautifiedPath = (substr($path, 0, 1) == '/') ? '/' : '.';
         }
 
-        return ltrim($beautifiedPath, "/\\");
+        return $beautifiedPath;
     }
 
     /**
