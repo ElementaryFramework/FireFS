@@ -1,7 +1,7 @@
 <?php
 
 /**
- * WaterPipe - URL routing framework for PHP
+ * FireFS - Easily manage your filesystem, through PHP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,20 +22,30 @@
  * SOFTWARE.
  *
  * @category  Library
- * @package   WaterPipe
+ * @package   FireFS
  * @author    Axel Nana <ax.lnana@outlook.com>
  * @copyright 2018 Aliens Group, Inc.
- * @license   MIT <https://github.com/ElementaryFramework/WaterPipe/blob/master/LICENSE>
- * @version   0.0.1
- * @link      http://waterpipe.na2axl.tk
+ * @license   MIT <https://github.com/ElementaryFramework/FireFS/blob/master/LICENSE>
+ * @version   GIT: 0.0.1
+ * @link      http://firefs.na2axl.tk
  */
 
 namespace ElementaryFramework\FireFS\Exceptions;
 
+/**
+ * File System Not Found Exception
+ *
+ * Exception thrown when the fetched file system entity
+ * was not found.
+ *
+ * @package    FireFS
+ * @subpackage Exceptions
+ * @author     Axel Nana <ax.lnana@outlook.com>
+ */
 class FileSystemEntityNotFoundException extends \Exception
 {
     public function __construct(string $path)
     {
-        parent::__construct("Unable to find the entity at path \"{$path}\"");
+        parent::__construct("Unable to find the file system entity at path \"{$path}\"");
     }
 }
