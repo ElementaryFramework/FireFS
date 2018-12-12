@@ -30,8 +30,17 @@
  * @link      http://firefs.na2axl.tk
  */
 
-namespace ElementaryFramework\FireFS;
+namespace ElementaryFramework\FireFS\Entities;
 
+/**
+ * File
+ *
+ * Represent a file in the file system.
+ *
+ * @package    FireFS
+ * @subpackage Entities
+ * @author     Axel Nana <ax.lnana@outlook.com>
+ */
 class File extends FileSystemEntity
 {
     /**
@@ -87,8 +96,8 @@ class File extends FileSystemEntity
     /**
      * Writes data into the file.
      *
-     * @param string $data The data to write into the file.
-     * @param bool $append Define if the data have to be appended at the
+     * @param string $data   The data to write into the file.
+     * @param bool   $append Define if the data have to be appended at the
      *                       end of the file (true), or overwrite the file
      *                       content (false).
      *
