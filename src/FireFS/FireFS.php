@@ -702,20 +702,20 @@ class FireFS
      * @param boolean $recursive Define if the directory have to be read recursively
      * @param array $options Additional options to use :
      *                                  path_type => The type of file path;
-     *                                  file_type => The extension(s) of files to select;
-     *                                  filter    => The extension(s) of files to ignore.
+     *                                  include   => The extension(s) of files to select;
+     *                                  exclude   => The extension(s) of files to ignore.
      *
      * @return array
      */
-    public function readDir(string $path, bool $recursive = false, array $options = array('path_type' => self::REAL_PATH, 'file_type' => false, 'filter' => false)): array
+    public function readDir(string $path, bool $recursive = false, array $options = array('path_type' => self::REAL_PATH, 'include' => false, 'exclude' => false)): array
     {
         if (!$this->isRemote($path) && !is_readable($this->toInternalPath($path))) {
             throw $this->accessDeniedException($path, 'read');
         }
 
         $options['path_type'] = !isset($options['path_type']) ? self::REAL_PATH : $options['path_type'];
-        $options['file_type'] = !isset($options['file_type']) ? false : $options['file_type'];
-        $options['filter'] = !isset($options['filter']) ? false : $options['filter'];
+        $options['include'] = !isset($options['include']) ? false : $options['include'];
+        $options['exclude'] = !isset($options['exclude']) ? false : $options['exclude'];
 
         $path = $this->toInternalPath($path);
         $files = array();
@@ -729,17 +729,17 @@ class FireFS
                     continue;
                 }
                 // Applying filters
-                if (is_string($options['filter']) && $this->extension($filepath) == $options['filter']) {
+                if (is_string($options['exclude']) && $this->extension($filepath) == $options['exclude']) {
                     continue;
                 }
-                if (is_array($options['filter']) && in_array($this->extension($filepath), $options['filter'])) {
+                if (is_array($options['exclude']) && in_array($this->extension($filepath), $options['exclude'])) {
                     continue;
                 }
                 // Skipping unwanted files
-                if (is_string($options['file_type']) && $this->extension($filepath) != $options['file_type']) {
+                if (is_string($options['include']) && $this->extension($filepath) != $options['include']) {
                     continue;
                 }
-                if (is_array($options['file_type']) && !in_array($this->extension($filepath), $options['file_type'])) {
+                if (is_array($options['include']) && !in_array($this->extension($filepath), $options['include'])) {
                     continue;
                 }
 
