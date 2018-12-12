@@ -30,18 +30,32 @@
  * @link      http://firefs.na2axl.tk
  */
 
-namespace ElementaryFramework\FireFS;
+namespace ElementaryFramework\FireFS\Entities;
 
 use ElementaryFramework\FireFS\Exceptions\FileSystemEntityNotFoundException;
 
+/**
+ * File System Entity
+ *
+ * Abstract base class used to implement all others entities
+ * (fils, folders, etc...)
+ *
+ * @package    FireFS
+ * @subpackage Entities
+ * @author     Axel Nana <ax.lnana@outlook.com>
+ */
 abstract class FileSystemEntity
 {
     /**
+     * The path to the managed entity in the file system.
+     *
      * @var string
      */
     protected $_path;
 
     /**
+     * The file system manager instance.
+     *
      * @var FireFS
      */
     protected $_fs;
@@ -50,7 +64,7 @@ abstract class FileSystemEntity
      * FileSystemEntity constructor.
      *
      * @param string $path The path to the FS entity.
-     * @param FireFS $fs The filesystem instance.
+     * @param FireFS $fs   The filesystem instance.
      *
      * @throws FileSystemEntityNotFoundException When the entity was not found on the given filesystem.
      */
@@ -203,21 +217,41 @@ abstract class FileSystemEntity
         return new Folder($this->_fs->dirname($this->_path), $this->_fs);
     }
 
+    /**
+     * Gets the size of this entity.
+     *
+     * @return integer
+     */
     public function getSize(): int
     {
         return $this->_fs->size($this->_path);
     }
 
+    /**
+     * Gets the size of this entity, formatted in octets.
+     *
+     * @return string
+     */
     public function getSizeInOctets(): string
     {
         return $this->_fs->sizeInOctets($this->_path);
     }
 
+    /**
+     * Gets the last modification time of this entity.
+     *
+     * @return integer
+     */
     public function getLastModificationTime(): int
     {
         return $this->_fs->lastModTime($this->_path);
     }
 
+    /**
+     * Gets the last access time of this entity.
+     *
+     * @return integer
+     */
     public function getLastAccessTime(): int
     {
         return $this->_fs->lastAccessTime($this->_path);

@@ -30,14 +30,16 @@
  * @link      http://firefs.na2axl.tk
  */
 
-namespace ElementaryFramework\FireFS;
+namespace ElementaryFramework\FireFS\Entities;
 
 /**
  * Class Folder
  *
  * Represent a folder in the file system.
  *
- * @package ElementaryFramework\FireFS
+ * @package    FireFS
+ * @subpackage Entities
+ * @author     Axel Nana <ax.lnana@outlook.com>
  */
 class Folder extends FileSystemEntity
 {
@@ -50,12 +52,20 @@ class Folder extends FileSystemEntity
     }
 
     /**
-     * @param bool $recursive
-     * @param array $options
-     * @return Folder[]|File[]
+     * Reads the folder and return the list of entities
+     * contained in it.
+     *
+     * @param bool  $recursive Define if we have to read the folder recursively. Defaults to false.
+     * @param array $options   An array of options for the directory reader. Options are:
+     *  - `include` which is an array of extensions to lookup in the directory and subdirectories if any.
+     *  - `exclude` which is an array of extensions to ignore in the directory and subdirectories if any.
+     * Both options are optionals.
+     *
+     * @return FileSystemEntity[] The list of entities in the folder.
+     *
      * @throws Exceptions\FileSystemEntityNotFoundException
      */
-    public function read(bool $recursive = false, array $options = array('path_type' => FireFS::REAL_PATH, 'file_type' => false, 'filter' => false)): array
+    public function read(bool $recursive = false, array $options = array('include' => false, 'exclude' => false)): array
     {
         $content = $this->_fs->readDir($this->_path, $recursive, $options);
 
