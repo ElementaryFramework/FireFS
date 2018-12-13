@@ -33,6 +33,10 @@
 namespace ElementaryFramework\FireFS;
 
 use ElementaryFramework\FireFS\Exceptions\FileSystemEntityNotFoundException;
+use ElementaryFramework\FireFS\Listener\IFileSystemListener;
+use ElementaryFramework\FireFS\Events\FileSystemEntityCreatedEvent;
+use ElementaryFramework\FireFS\Events\FileSystemEntityDeletedEvent;
+use ElementaryFramework\FireFS\Events\FileSystemEntityModifiedEvent;
 
 /**
  * FireFS - Filesystem Manager Class
@@ -103,6 +107,14 @@ class FireFS
     protected $aliases = array();
 
     /**
+     * The file system event listener of
+     * this instance.
+     *
+     * @var IFileSystemListener
+     */
+    protected $listener;
+
+    /**
      * Class constructor
      *
      * Set de default root path,
@@ -144,6 +156,26 @@ class FireFS
     public function setTempDir(string $path)
     {
         $this->tempDir = $this->cleanPath($path);
+    }
+
+    /**
+     * Sets the file system listener of this instance.
+     *
+     * It's important to note that this listener will
+     * used only to listen actions from this instance
+     * of FireFS. It cannot listen for changes from the
+     * outside.
+     *
+     * If you want to watch the file system for changes,
+     * use the FileSystemWatcher class.
+     *
+     * @param IFileSystemListener $listener The event listener.
+     *
+     * @return void
+     */
+    public function setListener(IFileSystemListener $listener)
+    {
+        $this->listener = $listener;
     }
 
     /**
@@ -399,6 +431,7 @@ class FireFS
             $file = fopen($internalPath, "a");
             if (fwrite($file, $data) !== false) {
                 fclose($file);
+                $this->_onModify($path);
                 return true;
             } else {
                 fclose($file);
@@ -415,6 +448,7 @@ class FireFS
             }
 
             if (file_put_contents($internalPath, $data) !== false) {
+                $this->_onModify($path);
                 if ($applyChmod) {
                     chmod($internalPath, 0777);
                 }
@@ -465,6 +499,7 @@ class FireFS
             throw new \RuntimeException("Cannot create file \"{$path}\"");
         } else {
             chmod($internalPath, 0777);
+            $this->_onCreate($path);
             return true;
         }
     }
@@ -581,6 +616,7 @@ class FireFS
             throw new \RuntimeException("Cannot create directory \"{$path}\"");
         } else {
             chmod($internalPath, 0777);
+            $this->_onCreate($path);
             return true;
         }
     }
@@ -628,6 +664,8 @@ class FireFS
         if (!rename($sourceInternalPath, $destInternalPath)) {
             throw new \RuntimeException("Cannot move file from \"{$path}\" to \"{$new_path}\"");
         } else {
+            $this->_onDelete($path);
+            $this->_onCreate($new_path);
             return true;
         }
     }
@@ -690,6 +728,7 @@ class FireFS
             if (copy($sourceInternalPath, $destInternalPath) === false) {
                 throw new \RuntimeException("Cannot copy file from \"{$path}\" to \"{$new_path}\"");
             } else {
+                $this->_onCreate($new_path);
                 return true;
             }
         }
@@ -943,12 +982,14 @@ class FireFS
                 if (rmdir($internalPath) === false) {
                     throw new \RuntimeException("Cannot delete directory \"{$path}\".");
                 } else {
+                    $this->_onDelete($path);
                     return true;
                 }
             } else {
                 if (unlink($internalPath) === false) {
                     throw new \RuntimeException("Cannot delete file \"{$path}\".");
                 } else {
+                    $this->_onDelete($path);
                     return true;
                 }
             }
@@ -1122,6 +1163,42 @@ class FireFS
             return $this->isDir($path) ? new Folder($path, $this) : new File($path, $this);
         } else {
             throw new FileSystemEntityNotFoundException($path);
+        }
+    }
+
+    /**
+     * Raise a "create" event.
+     *
+     * @param string $path The path of the entity which raised the event.
+     */
+    private function _onCreate(string $path)
+    {
+        if ($this->listener instanceof IFileSystemListener) {
+            $this->listener->onCreated(new FileSystemEntityCreatedEvent($path));
+        }
+    }
+
+    /**
+     * Raise a "modify" event.
+     *
+     * @param string $path The path of the entity which raised the event.
+     */
+    private function _onModify(string $path)
+    {
+        if ($this->listener instanceof IFileSystemListener) {
+            $this->listener->onCreated(new FileSystemEntityModifiedEvent($path));
+        }
+    }
+
+    /**
+     * Raise a "delete" event.
+     *
+     * @param string $path The path of the entity which raised the event.
+     */
+    private function _onDelete(string $path)
+    {
+        if ($this->listener instanceof IFileSystemListener) {
+            $this->listener->onCreated(new FileSystemEntityDeletedEvent($path));
         }
     }
 }
