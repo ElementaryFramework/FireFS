@@ -889,9 +889,12 @@ class FireFS
     /**
      * Create a new temporary file.
      *
+     * @param string $prefix The prefix of the temporary
+     *                       file to create.
+     *
      * @return string The temporary file path.
      */
-    public function tmpfile(): string
+    public function tmpfile(string $prefix = "tmp"): string
     {
         $tmpDir = $this->toInternalPath($this->tempDir);
 
@@ -899,7 +902,7 @@ class FireFS
             $this->mkdir($tmpDir, true);
         }
 
-        $tmpFile = tempnam($tmpDir, "tmp");
+        $tmpFile = tempnam($tmpDir, $prefix);
 
         $fileManager = $this;
 
