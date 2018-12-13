@@ -33,7 +33,7 @@
 namespace ElementaryFramework\FireFS\Exceptions;
 
 /**
- * File System Not Found Exception
+ * File System Entity Not Found Exception
  *
  * Exception thrown when the fetched file system entity
  * was not found.
