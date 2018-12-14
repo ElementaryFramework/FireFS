@@ -37,6 +37,8 @@ use ElementaryFramework\FireFS\Listener\IFileSystemListener;
 use ElementaryFramework\FireFS\Events\FileSystemEntityCreatedEvent;
 use ElementaryFramework\FireFS\Events\FileSystemEntityDeletedEvent;
 use ElementaryFramework\FireFS\Events\FileSystemEntityModifiedEvent;
+use ElementaryFramework\FireFS\Entities\Folder;
+use ElementaryFramework\FireFS\Entities\File;
 
 /**
  * FireFS - Filesystem Manager Class

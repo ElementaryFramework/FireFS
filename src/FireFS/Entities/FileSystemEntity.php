@@ -33,6 +33,7 @@
 namespace ElementaryFramework\FireFS\Entities;
 
 use ElementaryFramework\FireFS\Exceptions\FileSystemEntityNotFoundException;
+use ElementaryFramework\FireFS\FireFS;
 
 /**
  * File System Entity
