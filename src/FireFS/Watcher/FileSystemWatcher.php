@@ -63,7 +63,7 @@ class FileSystemWatcher
      *
      * @var string
      */
-    private $_path;
+    private $_path = "./";
 
     /**
      * Define if we are watching changes
@@ -71,14 +71,14 @@ class FileSystemWatcher
      *
      * @var bool
      */
-    private $_recursive;
+    private $_recursive = true;
 
     /**
      * The regex pattern of files and folders to watch.
      *
      * @var string
      */
-    private $_patternInclude;
+    private $_patternInclude = "/^.*$/U";
 
     /**
      * The regex pattern of files and folders
@@ -86,7 +86,7 @@ class FileSystemWatcher
      *
      * @var string
      */
-    private $_patternExclude;
+    private $_patternExclude = "";
 
     /**
      * The number of milliseconds to wait before
@@ -94,21 +94,21 @@ class FileSystemWatcher
      *
      * @var integer
      */
-    private $_watchInterval;
+    private $_watchInterval = 1000000;
 
     /**
      * Defines if the watcher is started and running.
      *
      * @var bool
      */
-    private $_started;
+    private $_started = false;
 
     /**
      * Defines if the watcher is built.
      *
      * @var bool
      */
-    private $_built;
+    private $_built = false;
 
     /**
      * Stores the list of files in the watched
@@ -141,7 +141,6 @@ class FileSystemWatcher
     public function __construct(FireFS &$fs)
     {
         $this->_fs = $fs;
-        $this->_watchInterval = 1000000;
     }
 
     /**
@@ -253,11 +252,21 @@ class FileSystemWatcher
         $this->_started = true;
 
         while ($this->_started) {
-            clearstatcache(true);
-            $this->_detectChanges();
-            $this->_cacheLastModTimes();
+            $this->process();
             usleep($this->_watchInterval);
         }
+    }
+
+    /**
+     * Process a watch
+     *
+     * @return void
+     */
+    public function process()
+    {
+        clearstatcache(true);
+        $this->_detectChanges();
+        $this->_cacheLastModTimes();
     }
 
     /**
