@@ -89,4 +89,25 @@ abstract class FileSystemEvent
         $this->_eventType = $type;
         $this->_path = $path;
     }
+
+    /**
+     * Returns the type of this event.
+     *
+     * @return integer
+     */
+    public function getEventType(): int
+    {
+        return $this->_eventType;
+    }
+
+    /**
+     * Returns the path of the entity which raised
+     * this event.
+     *
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->_path;
+    }
 }
