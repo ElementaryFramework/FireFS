@@ -32,15 +32,23 @@
 
 namespace ElementaryFramework\FireFS\Watcher;
 
-use ElementaryFramework\FireFS\Listener\IFileSystemListener;
 use ElementaryFramework\FireFS\FireFS;
-use ElementaryFramework\FireFS\Exceptions\FileSystemEntityNotFoundException;
-use ElementaryFramework\FireFS\Exceptions\FileSystemWatcherException;
 use ElementaryFramework\FireFS\Events\FileSystemEntityModifiedEvent;
 use ElementaryFramework\FireFS\Events\FileSystemEntityDeletedEvent;
 use ElementaryFramework\FireFS\Events\FileSystemEntityCreatedEvent;
+use ElementaryFramework\FireFS\Exceptions\FileSystemEntityNotFoundException;
+use ElementaryFramework\FireFS\Exceptions\FileSystemWatcherException;
+use ElementaryFramework\FireFS\Listener\IFileSystemListener;
 
-
+/**
+ * File System Watcher
+ *
+ * Watch for changes (files/folders creation, modification and deletion) on the file system.
+ *
+ * @package    FireFS
+ * @subpackage Watcher
+ * @author     Axel Nana <ax.lnana@outlook.com>
+ */
 class FileSystemWatcher
 {
     /**
@@ -76,17 +84,20 @@ class FileSystemWatcher
     /**
      * The regex pattern of files and folders to watch.
      *
-     * @var string
+     * @var array
      */
-    private $_patternInclude = "/^.*$/U";
+    private $_patternInclude = array();
 
     /**
      * The regex pattern of files and folders
      * to excludes from watching.
      *
-     * @var string
+     * @var array
      */
-    private $_patternExclude = "";
+    private $_patternExclude = array(
+        "/^.+[\/\\\\]node_modules[\/\\\\].*$/",
+        "/^.+[\/\\\\]\.git[\/\\\\].*$/"
+    );
 
     /**
      * The number of milliseconds to wait before
@@ -186,16 +197,58 @@ class FileSystemWatcher
         return $this;
     }
 
-    public function setPattern(string $pattern): self
+    /**
+     * Adds a new regex pattern for files to watch.
+     *
+     * @param string $pattern The regex pattern to add.
+     *
+     * @return self
+     */
+    public function addPattern(string $pattern): self
     {
-        $this->_patternInclude = $pattern;
+        $this->_patternInclude[] = $pattern;
 
         return $this;
     }
 
-    public function setExcludePattern(string $pattern): self
+    /**
+     * Adds a new regex pattern for files to exclude from watcher.
+     *
+     * @param string $pattern The regex pattern to add.
+     *
+     * @return self
+     */
+    public function addExcludePattern(string $pattern): self
     {
-        $this->_patternExclude = $pattern;
+        $this->_patternExclude[] = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Set the array of regex patterns matching files to watch.
+     *
+     * @param array $patterns The array of regex patterns.
+     *
+     * @return self
+     */
+    public function setPatterns(array $patterns) : self
+    {
+        $this->_patternInclude = $patterns;
+
+        return $this;
+    }
+
+    /**
+     * Set the array of regex patterns matching files to exclude from watcher.
+     *
+     * @param array $patterns The array of regex patterns.
+     *
+     * @return self
+     */
+    public function setExcludePatterns(array $patterns)
+    {
+        $this->_patternExclude = $patterns;
 
         return $this;
     }
@@ -311,7 +364,6 @@ class FileSystemWatcher
 
     private function _watchFolder(string $_path)
     {
-        // TODO: Apply include and exclude patterns
         $directory = $this->_fs->readDir($_path, $this->_recursive);
         $watching = array_merge($this->_filesCache, $directory);
 
@@ -328,26 +380,48 @@ class FileSystemWatcher
 
     private function _watchFile(string $_path)
     {
-        $path = $this->_fs->cleanPath($_path);
+        if (count($this->_patternExclude) > 0) {
+            foreach ($this->_patternExclude as $pattern) {
+                if (preg_match($pattern, $_path, $m)) {
+                    return;
+                }
+            }
+        }
 
-        if ($this->_fs->exists($path)) {
-            if (array_key_exists($path, $this->_lastModTimeCache)) {
-                if ($this->_lastModTimeCache[$path] < $this->_lmt($path)) {
-                    if ($this->_listener->onAny(new FileSystemEntityModifiedEvent($path))) {
-                        $this->_listener->onModified(new FileSystemEntityModifiedEvent($path));
+        $match = true;
+
+        if (count($this->_patternInclude) > 0) {
+            $match = false;
+            foreach ($this->_patternInclude as $pattern) {
+                if (preg_match($pattern, $_path, $m)) {
+                    $match = true;
+                    break;
+                }
+            }
+        }
+
+        if ($match) {
+            $path = $this->_fs->cleanPath($_path);
+
+            if ($this->_fs->exists($path)) {
+                if (array_key_exists($path, $this->_lastModTimeCache)) {
+                    if ($this->_lastModTimeCache[$path] < $this->_lmt($path)) {
+                        if ($this->_listener->onAny(new FileSystemEntityModifiedEvent($path))) {
+                            $this->_listener->onModified(new FileSystemEntityModifiedEvent($path));
+                        }
+                    }
+                } else {
+                    $this->_addForWatch($_path);
+                    if ($this->_listener->onAny(new FileSystemEntityCreatedEvent($path))) {
+                        $this->_listener->onModified(new FileSystemEntityCreatedEvent($path));
                     }
                 }
             } else {
-                $this->_addForWatch($_path);
-                if ($this->_listener->onAny(new FileSystemEntityCreatedEvent($path))) {
-                    $this->_listener->onModified(new FileSystemEntityCreatedEvent($path));
-                }
-            }
-        } else {
-            if (array_key_exists($path, $this->_lastModTimeCache)) {
-                $this->_removeFromWatch($_path);
-                if ($this->_listener->onAny(new FileSystemEntityDeletedEvent($path))) {
-                    $this->_listener->onDeleted(new FileSystemEntityDeletedEvent($path));
+                if (array_key_exists($path, $this->_lastModTimeCache)) {
+                    $this->_removeFromWatch($_path);
+                    if ($this->_listener->onAny(new FileSystemEntityDeletedEvent($path))) {
+                        $this->_listener->onDeleted(new FileSystemEntityDeletedEvent($path));
+                    }
                 }
             }
         }
