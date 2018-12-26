@@ -1176,7 +1176,10 @@ class FireFS
     private function _onCreate(string $path)
     {
         if ($this->listener instanceof IFileSystemListener) {
-            $this->listener->onCreated(new FileSystemEntityCreatedEvent($path));
+            $event = new FileSystemEntityCreatedEvent($path);
+            if ($this->listener->onAny($event)) {
+                $this->listener->onCreated($event);
+            }
         }
     }
 
@@ -1188,7 +1191,10 @@ class FireFS
     private function _onModify(string $path)
     {
         if ($this->listener instanceof IFileSystemListener) {
-            $this->listener->onCreated(new FileSystemEntityModifiedEvent($path));
+            $event = new FileSystemEntityModifiedEvent($path);
+            if ($this->listener->onAny($event)) {
+                $this->listener->onModified($event);
+            }
         }
     }
 
@@ -1200,7 +1206,10 @@ class FireFS
     private function _onDelete(string $path)
     {
         if ($this->listener instanceof IFileSystemListener) {
-            $this->listener->onCreated(new FileSystemEntityDeletedEvent($path));
+            $event = new FileSystemEntityDeletedEvent($path);
+            if ($this->listener->onAny($event)) {
+                $this->listener->onDeleted($event);
+            }
         }
     }
 }
