@@ -96,7 +96,8 @@ class FileSystemWatcher
      */
     private $_patternExclude = array(
         "/^.+[\/\\\\]node_modules[\/\\\\]?.*$/",
-        "/^.+[\/\\\\]\.git[\/\\\\]?.*$/"
+        "/^.+[\/\\\\]\.git[\/\\\\]?.*$/",
+        "/^.+[\/\\\\]vendor[\/\\\\]?.*$/"
     );
 
     /**
