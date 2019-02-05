@@ -1,4 +1,10 @@
-# :fire: FireFS
+<center>
+
+![FireFS Logo](assets/banner.png)
+
+</center>
+
+# FireFS
 
 Manage your file system easily, through php
 
@@ -51,7 +57,7 @@ $fs->move("images", "blog/images");
 - Easy file system management ;
 - Object Oriented file system entities management, through [Folder](https://github.com/ElementaryFramework/FireFS/blob/master/src/FireFS/Entities/Folder.php) and [File](https://github.com/ElementaryFramework/FireFS/blob/master/src/FireFS/Entities/File.php) classes ;
 - Receive events of what happen to your file system (created, modified, deleted events) and execute a specific action with the [file system listener](https://github.com/ElementaryFramework/FireFS/blob/master/src/FireFS/Listener/IFileSystemListener.php) ;
-- Run a [file system watcher](https://github.com/ElementaryFramework/FireFS/blob/master/src/FireFS/Watcher/FileSystemWatcher.php) to watch for files changes in **real time** (recommended for console applications)
+- Run a [file system watcher](https://github.com/ElementaryFramework/FireFS/blob/master/src/FireFS/Watcher/FileSystemWatcher.php) to watch for files changes in **real time** (recommended for console applications or long running PHP processes)
 
 ## Installation
 
