@@ -178,7 +178,7 @@ class FileSystemWatcher
      */
     public function setPath(string $path): self
     {
-        $this->_path = $path;
+        $this->_path = $this->_fs->toInternalPath($path);
 
         return $this;
     }
@@ -318,9 +318,12 @@ class FileSystemWatcher
      */
     public function process()
     {
+        $oldWD = $this->_fs->workingDir();
+        $this->_fs->setWorkingDir($this->_fs->dirname($this->_path));
         clearstatcache(true);
         $this->_detectChanges();
         $this->_cacheLastModTimes();
+        $this->_fs->setWorkingDir($oldWD);
     }
 
     /**
