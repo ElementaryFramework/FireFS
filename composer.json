@@ -13,7 +13,9 @@
     }
   ],
   "require": {
-    "php": "^7.1.10"
+    "php": "^7.1.10",
+    "elementaryframework/streams": "^0.0.2",
+    "elementaryframework/events": "^0.0.1"
   },
   "keywords": [
     "filesystem",
