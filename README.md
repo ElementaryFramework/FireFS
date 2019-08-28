@@ -74,8 +74,12 @@ Once installed, you can access the **FireFS** api through the `ElementaryFramewo
 New to **FireFS** ? From console to web apps, you can read the [wiki](https://github.com/ElementaryFramework/FireFS/wiki) to know how to use this
 library into your project.
 
+### Additional resources and tutorials
+
+- [How to create a file watcher with PHP and the Elementary Framework](https://dev.to/na2axl/how-to-create-a-file-watcher-with-php-and-the-elementary-framework-1po) written by @na2axl on dev.to
+
 ## License
 
-&copy; 2018 Aliens Group, Inc.
+&copy; 2019 Aliens Group.
 
 Licensed under MIT ([read license](https://github.com/ElementaryFramework/FireFS/blob/master/LICENSE)).
