@@ -32,16 +32,18 @@
 
 namespace ElementaryFramework\FireFS\Events;
 
+use ElementaryFramework\Core\Events\IEvent;
+
 /**
  * File System Event
  *
  * Represent an event occurred in the file system manager.
  *
  * @package    FireFS
- * @subpackage Exceptions
+ * @subpackage Events
  * @author     Axel Nana <ax.lnana@outlook.com>
  */
-abstract class FileSystemEvent
+abstract class FileSystemEvent implements IEvent
 {
     /**
      * Represent an unknown event.
