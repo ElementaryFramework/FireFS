@@ -36,7 +36,6 @@ use ElementaryFramework\FireFS\FireFS;
 use ElementaryFramework\FireFS\Events\FileSystemEntityModifiedEvent;
 use ElementaryFramework\FireFS\Events\FileSystemEntityDeletedEvent;
 use ElementaryFramework\FireFS\Events\FileSystemEntityCreatedEvent;
-use ElementaryFramework\FireFS\Exceptions\FileSystemEntityNotFoundException;
 use ElementaryFramework\FireFS\Exceptions\FileSystemWatcherException;
 use ElementaryFramework\FireFS\Listener\IFileSystemListener;
 
@@ -417,7 +416,7 @@ class FileSystemWatcher
                 } else {
                     $this->_addForWatch($_path);
                     if ($this->_listener->onAny(new FileSystemEntityCreatedEvent($path))) {
-                        $this->_listener->onModified(new FileSystemEntityCreatedEvent($path));
+                        $this->_listener->onCreated(new FileSystemEntityCreatedEvent($path));
                     }
                 }
             } else {
