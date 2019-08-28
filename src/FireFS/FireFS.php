@@ -252,7 +252,7 @@ class FireFS
      */
     public function setWorkingDir(string $workingDir)
     {
-        $this->workingDir = $workingDir;
+        $this->workingDir = $this->toExternalPath($workingDir);
     }
 
     /**
@@ -854,6 +854,10 @@ class FireFS
             if (substr($externalPath, 0, strlen($realRootPath)) == $realRootPath) {
                 $externalPath = substr($externalPath, strlen($realRootPath));
             }
+        }
+
+        if (strlen($externalPath) === 0) {
+            return $this->cleanPath("./");
         }
 
         if ($externalPath[0] != '/') {
