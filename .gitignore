@@ -7,6 +7,10 @@
 # IntelliJ platforms
 .idea/
 
+# KDevelop
+.kdev*/
+*.kdev*
+
 # PHP Code Sniffer config
 .php_cs
 
