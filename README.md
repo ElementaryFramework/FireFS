@@ -6,6 +6,11 @@
 
 # FireFS
 
+[![downloads](https://img.shields.io/packagist/dt/elementaryframework/fire-fs?style=for-the-badge&logo=packagist)](https://packagist.org/packages/elementaryframework/fire-fs)
+[![downloads](https://img.shields.io/packagist/v/elementaryframework/fire-fs?style=for-the-badge&logo=packagist)](https://packagist.org/packages/elementaryframework/fire-fs)
+[![downloads](https://img.shields.io/github/repo-size/ElementaryFramework/FireFS?style=for-the-badge&logo=github)](https://github.com/ElementaryFramework/FireFS)
+[![downloads](https://img.shields.io/github/license/ElementaryFramework/FireFS?style=for-the-badge&logo=github)](https://github.com/ElementaryFramework/FireFS/blob/master/LICENSE)
+
 Manage your file system easily, through php
 
 **FireFS** is a library allowing you to write/read/delete files and folders of your file system, safely and easily.
