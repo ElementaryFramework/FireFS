@@ -78,8 +78,14 @@ library into your project.
 
 - [How to create a file watcher with PHP and the Elementary Framework](https://dev.to/na2axl/how-to-create-a-file-watcher-with-php-and-the-elementary-framework-1po) written by @na2axl on dev.to
 
+## Donate
+
+Liking Elementary Framework? Help us continue to maintain it and provide you better support and awesome functionalities with a small donation!
+
+[![Donate PayPal Button](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AGAQAC3W4ZRMA&source=url)
+
 ## License
 
-&copy; 2019 Aliens Group.
+&copy; 2018-2020 Aliens Group.
 
 Licensed under MIT ([read license](https://github.com/ElementaryFramework/FireFS/blob/master/LICENSE)).
