@@ -273,6 +273,7 @@ class FileSystemWatcher
             $this->_watchingDirectory = false;
 
             $this->_lastModTimeCache = array();
+            $this->_filesCache = array();
 
             if ($this->_fs->isDir($this->_path)) {
                 $this->_filesCache = $this->_fs->readDir($this->_path, $this->_recursive);
@@ -433,7 +434,11 @@ class FileSystemWatcher
     private function _cacheLastModTimes()
     {
         foreach ($this->_filesCache as $name => $path) {
-            $this->_lastModTimeCache[$path] = $this->_lmt($path);
+            // If the file got deleted during from the listener,
+            // or during the process but after scanning for changes.
+            if ($this->_fs->exists($path)) {
+                $this->_lastModTimeCache[$path] = $this->_lmt($path);
+            }
         }
     }
 
@@ -445,7 +450,7 @@ class FileSystemWatcher
     private function _addForWatch(string $path)
     {
         $p =  $this->_fs->cleanPath($path);
-        $this->_filesCache = array($path => $p);
+        $this->_filesCache[$path] = $p;
         $this->_lastModTimeCache[$p] = $this->_lmt($p);
     }
 
