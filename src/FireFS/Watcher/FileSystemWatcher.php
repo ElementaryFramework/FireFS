@@ -318,12 +318,17 @@ class FileSystemWatcher
      */
     public function process()
     {
-        $oldWD = $this->_fs->workingDir();
-        $this->_fs->setWorkingDir($this->_fs->dirname($this->_path));
+        if (!$this->_started) {
+            $oldWD = $this->_fs->workingDir();
+            $this->_fs->setWorkingDir($this->_fs->dirname($this->_path));
+        }
         clearstatcache(true);
         $this->_detectChanges();
         $this->_cacheLastModTimes();
-        $this->_fs->setWorkingDir($oldWD);
+
+        if (!$this->_started) {
+            $this->_fs->setWorkingDir($oldWD);
+        }
     }
 
     /**
