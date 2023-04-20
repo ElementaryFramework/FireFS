@@ -207,12 +207,12 @@ class FireFS
             }
         }
 
-        if ($path != '/') {
-            $beautifiedPath = implode(DIRECTORY_SEPARATOR, $cleanDirs);
+        if ($path != DIRECTORY_SEPARATOR) {
+            $beautifiedPath = $this->makePath(...$cleanDirs);
         }
 
         if (empty($beautifiedPath)) {
-            $beautifiedPath = (substr($path, 0, 1) == '/') ? '/' : '.';
+            $beautifiedPath = (substr($path, 0, 1) == DIRECTORY_SEPARATOR) ? DIRECTORY_SEPARATOR : '.';
         }
 
         return $beautifiedPath;
@@ -275,7 +275,7 @@ class FireFS
      */
     public function newAlias(string $key, string $val)
     {
-        if (substr($val, -1) == '/') {
+        if (substr($val, -1) == DIRECTORY_SEPARATOR) {
             $val = substr($val, 0, -1);
         }
 
@@ -324,8 +324,9 @@ class FireFS
             return $internalPath;
         }
 
+        // Remove root path
         if (substr($internalPath, 0, strlen($this->rootPath())) == $this->rootPath()) {
-            $internalPath = str_replace($this->rootPath(), './', $internalPath);
+            $internalPath = substr($internalPath, strlen($this->rootPath()));
         } else {
             $realRootPath = realpath($this->rootPath());
             if (substr($internalPath, 0, strlen($realRootPath)) == $realRootPath) {
@@ -333,8 +334,18 @@ class FireFS
             }
         }
 
-        // Convert relative path to absolute path
-        if (preg_match('#^(\.)+/#', $internalPath)) {
+        // Remove workdir if any
+        if (substr($internalPath, 0, strlen($this->workingDir())) == $this->workingDir()) {
+            $internalPath = str_replace($this->workingDir(), '.', $internalPath);
+        } else {
+            $realPath = realpath($this->workingDir());
+            if (substr($internalPath, 0, strlen($realPath)) == $realPath) {
+                $internalPath = substr($internalPath, strlen($realPath));
+            }
+        }
+
+        // Append workdir
+        if (preg_match('#^(\.)+\\' . DIRECTORY_SEPARATOR . '#', $internalPath)) {
             $internalPath = $this->makePath($this->workingDir(), $internalPath);
         }
 
@@ -548,26 +559,13 @@ class FireFS
                         return "file";
                     }
                 }
-                break;
 
             case PATHINFO_FILENAME :
                 $basename = basename($internalPath);
                 return substr($basename, 0, strrpos($basename, '.'));
 
             case PATHINFO_DIRNAME:
-                if (strpos($path, "/", 1) !== false) {
-                    $dirname = preg_replace('#/[^/]*/?$#', '', $path);
-                } elseif (strpos($path, "/") === 0) {
-                    $dirname = "/";
-                } else {
-                    $dirname = false;
-                }
-
-                if ($dirname == ".") {
-                    $dirname = false;
-                }
-
-                return $dirname;
+                return dirname($path);
 
             default:
                 return "unknown";
@@ -847,6 +845,7 @@ class FireFS
             return $externalPath;
         }
 
+        // Remove root path
         if (substr($externalPath, 0, strlen($this->rootPath())) == $this->rootPath()) {
             $externalPath = substr($externalPath, strlen($this->rootPath()));
         } else {
@@ -856,21 +855,22 @@ class FireFS
             }
         }
 
+        // If the internal path was the root path, set it to the dot slash notation
         if (strlen($externalPath) === 0) {
             return $this->cleanPath("./");
         }
 
-        if ($externalPath[0] != '/') {
+        if ($externalPath[0] != DIRECTORY_SEPARATOR) {
             return $internalPath;
         }
 
         $nbrTurns = 0;
         $maxNbrTurns = count($this->aliases);
-        do {
-            $appliedAliasesNbr = 0;
+        $appliedAliasesNbr = 0;
 
+        do {
             foreach ($this->aliases as $key => $value) {
-                $value = '/' . $value;
+                $value = DIRECTORY_SEPARATOR . $value;
                 if (substr($externalPath, 0, strlen($value)) == $value) {
                     $externalPath = $this->makePath($key, substr($externalPath, strlen($value)));
                     $appliedAliasesNbr++;
@@ -879,6 +879,9 @@ class FireFS
 
             $nbrTurns++;
         } while ($appliedAliasesNbr > 0 && $nbrTurns <= $maxNbrTurns);
+
+        if ($appliedAliasesNbr == 0 && $externalPath[0] == DIRECTORY_SEPARATOR)
+            $externalPath = $this->makePath( '.', $externalPath);
 
         return $this->cleanPath($externalPath);
     }
@@ -924,7 +927,7 @@ class FireFS
             $nbrTurns++;
         } while ($appliedAliasesNbr > 0 && $nbrTurns <= $maxNbrTurns);
 
-        while (substr($externalPath, 0, 1) == '/' || substr($externalPath, 0, 2) == './') {
+        while (substr($externalPath, 0, 1) == DIRECTORY_SEPARATOR || substr($externalPath, 0, 2) == '.' . DIRECTORY_SEPARATOR) {
             $externalPath = substr($externalPath, 1);
         }
 
